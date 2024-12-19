@@ -1010,7 +1010,7 @@ rsync)
 renew)
   ACME_CLI_DOMAIN_LIST="${*:-$ACME_CLI_DOMAIN_LIST}"
   [ -n "$ACME_CLI_DOMAINS_NEW" ] || __gen_config &>/dev/null
-  __generate_domain_list && __certbot_renew
+  __certbot_renew
   exit $?
   ;;
 fix)
