@@ -375,9 +375,9 @@ __certbot_test() {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 __certbot_renew() {
-  __cert_dir_exists && return 0
-  __certbot_test renew || printf_exit "certbot renew has failed"
+  __cert_dir_exists || return 0
   printf_purple "Attempting to renew certificates"
+  __certbot_test renew || printf_exit "certbot renew has failed"
   certbot renew $ACME_CLI_SERVER_OPTIONS -n --agree-tos --expand $ACME_CLI_OPTIONS --dns-rfc2136 --dns-rfc2136-credentials $ACME_CLI_CONF_FILE 2>"$ACME_CLI_LOG_ERROR_FILE" >/dev/null
   __certbot_finalize $?
 }
