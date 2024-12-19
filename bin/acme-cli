@@ -1008,7 +1008,6 @@ rsync)
   exit $?
   ;;
 renew)
-  [ -f "/etc/letsencrypt/renewal/$ACME_CLI_CERT_DIR" ] || printf_exit "Can not find $ACME_CLI_DOMAIN_PRIMARY config"
   ACME_CLI_DOMAIN_LIST="${*:-$ACME_CLI_DOMAIN_LIST}"
   [ -n "$ACME_CLI_DOMAINS_NEW" ] || __gen_config &>/dev/null
   __generate_domain_list && __certbot_renew
