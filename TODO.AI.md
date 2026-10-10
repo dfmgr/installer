@@ -1,5 +1,39 @@
 # TODO.AI.md
 
+## bin/dockermgr: `--silent` is documented but unimplemented
+
+`__help`, man page, and completions all document `--silent`, and it is
+registered in the real `getopt` `LONGOPTS` string, but there is no case
+handler for it anywhere and no code references a silent/quiet-mode
+variable. Passing `--silent` currently does nothing. Needs either a real
+implementation (what should it suppress?) or removal from all three docs
+— a product decision, not made while doing the help/man/completions sync
+pass (202610102015-git).
+
+## bin/dockermgr: `builder` command is a stub ("work in progress")
+
+The `builder` command's case body is `printf_exit "This is a work in
+progress"` followed by unreachable dead code. Documented in `__help`/man
+with a "(work in progress)" annotation during the doc-sync pass, but the
+underlying command itself still needs to be finished or removed.
+
+## bin/composemgr: `--no-env`/`--yes-*`/`--no-*` documented but unimplemented
+
+`__help`, man page, and completions all document `--no-env`, `--yes-*`,
+and `--no-*`, backed by `GET_OPTIONS_NO`/`GET_OPTIONS_YES` constants —
+but neither variable is ever read anywhere in the script, these flags are
+not registered in the real `LONGOPTS` getopt string, and there is no case
+handler for any of them. Needs either a real implementation or removal
+from all three docs — a product decision, found during the help/man/
+completions sync pass, not made at that time.
+
+## bin/composemgr: `password` is a dead ARRAY entry
+
+The script's `ARRAY` variable includes `password` as a recognized
+subcommand token, but there is no case handler for it anywhere and it is
+correctly absent from `__help`/man/completions (all three already agree
+in excluding it). Either implement it or remove it from `ARRAY`.
+
 ## bin/systemmgr: pre-existing script-lint findings — NOT fixed
 
 The script-lint pass for the color-option and API-timeout changes found 16

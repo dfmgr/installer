@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 # - - - - - - - - - - - - - - - - - - - - - - - - -
-##@Version           :  202610081005-git
+##@Version           :  202610102015-git
 # @Author            :  Jason Hempstead
 # @Contact           :  jason@casjaysdev.pro
 # @License           :  WTFPL
@@ -10,7 +10,7 @@
 # @Created           :  Saturday, Aug 28, 2021 19:04 EDT
 # @File              :  dockermgr
 # @Description       :  docker script to manage containers
-# @Changelog         :  Redesign --migrate: loop all containers, system-wide root migration, overwrite semantics for /var/lib/srv/*/docker
+# @Changelog         :  Doc-sync __help/man with real commands+flags; fix --tag/--no-delete getopt typo; register --no-color, drop dead --raw
 # @TODO              :
 # @Other             :
 # @Resource          :
@@ -18,7 +18,7 @@
 # shellcheck disable=SC1001,SC2003,SC1003,SC2016,SC2031,SC2120,SC2155,SC2199,SC2317,SC2329
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 APPNAME="${0##*/}"
-VERSION="202610081005-git"
+VERSION="202610102015-git"
 USER="${SUDO_USER:-$USER}"
 RUN_USER="${RUN_USER:-$USER}"
 USER_HOME="${USER_HOME:-$HOME}"
@@ -186,6 +186,8 @@ __help() {
   __printf_line "tag <from> <to>                        - Tag a Docker image with a new name"
   __printf_line "pull [image]                           - Pull Docker images (updates all if no image specified)"
   __printf_line "prune [unnamed]                        - Clean up Docker system or remove unnamed/untagged images"
+  __printf_line "commit <name> <tag>                    - Commit a running container as a new image"
+  __printf_line "copy <source> <dest1,dest2,...>         - Copy/retag an image to one or more destination registries"
   __printf_line ""
   __printf_line "System Management Commands:"
   __printf_line "init [force]                           - Initialize dockermgr and install Docker (secure installation)"
@@ -198,6 +200,8 @@ __help() {
   __printf_line "swarm                                  - Initialize Docker swarm mode with current host"
   __printf_line "health [healthy|unhealthy|cont]        - Check container health status"
   __printf_line "proxy                                  - Setup Docker proxy container"
+  __printf_line "swap [size-in-GB]                      - Create a swap file (default 2G)"
+  __printf_line "server_status <url> [name] [script]    - Check if a server/URL is responding"
   __printf_line ""
   __printf_line "Orchestration Commands:"
   __printf_line "minikube [init|delete|dash|srv]        - Install and manage Minikube for local Kubernetes"
@@ -207,6 +211,12 @@ __help() {
   __printf_line "ds                                     - Install DockStarter for media server containers"
   __printf_line "multiarch                              - Setup multi-architecture building with QEMU"
   __printf_line "compose [update]                       - Install or update Docker Compose"
+  __printf_line "kasm                                   - Install Kasm Workspaces"
+  __printf_line "fe                                     - Install front-end management panels (Yacht, nginx-manager)"
+  __printf_line "manifest [create|download] [file]      - Build and push a multi-arch Docker manifest"
+  __printf_line "rebuild <dir|file|repo-url> [name]      - Rebuild a Docker image from a Dockerfile using buildx"
+  __printf_line "generate [dir]                         - Generate Dockerfile/build files for a project"
+  __printf_line "builder                                - Experimental multi-arch builder container (work in progress)"
   __printf_line ""
   __printf_line "Application Management Commands:"
   __printf_line "list                                   - List preconfigured installation scripts"
@@ -226,6 +236,8 @@ __help() {
   __printf_line "api delete <org/repo>                  - Delete a repository from Docker Hub"
   __printf_line "api sources [name|url|all]             - List available source repositories"
   __printf_line "api readme <file> <org> <repo>         - Upload README file to Docker Hub repository"
+  __printf_line "readme                                 - Upload README file to Docker Hub for the current image/repo"
+  __printf_line "org [name]                             - List repositories for a Docker Hub organization"
   __printf_head "- - - - - - - - - - - - - - - - - - - - - - - - -"
   __printf_opts "Other Options"
   __printf_head "- - - - - - - - - - - - - - - - - - - - - - - - -"
@@ -246,6 +258,16 @@ __help() {
   __printf_line "--network <network>                    - Specify Docker network"
   __printf_line "--name <name>                          - Set custom container name"
   __printf_line "--interactive                          - Run containers in interactive mode"
+  __printf_line "--tag <tag>                            - Set the tag used when pushing a manifest"
+  __printf_line "--no-delete                            - Keep temporary manifest tags instead of deleting them"
+  __printf_line "--describe <text>                      - Set the Docker Hub repository description"
+  __printf_line "--domain <domain>                      - Set the container domain name"
+  __printf_line "--hostname <hostname>                  - Set the container hostname"
+  __printf_line "--registry <registry>                  - Set the registry to push/pull from"
+  __printf_line "--hub <url>                             - Set the Docker Hub URL and registry"
+  __printf_line "--dockerfile                            - Build from a local Dockerfile"
+  __printf_line "--info                                 - Show image/repository info"
+  __printf_line "--cron                                  - Run via the configured cron entry"
   __printf_head "- - - - - - - - - - - - - - - - - - - - - - - - -"
   __printf_line "Examples:"
   __printf_line "dockermgr init                         - Initialize Docker environment"
@@ -3169,8 +3191,8 @@ fi
 # Set additional variables/Argument/Option settings
 SETARGS="$*"
 SHORTOPTS="p:,P,v:,m:,e:,d,u:,w:,"
-LONGOPTS="raw,completions:,options,config,version,help,migrate,dir:,"
-LONGOPTS+="force,all,describe:,platform:,dockerfile,name:,info,domain:,hostname:,network:,registry:,tag:no-delete,interactive,cron,hub:"
+LONGOPTS="completions:,options,config,version,help,migrate,dir:,no-color,"
+LONGOPTS+="force,all,describe:,platform:,dockerfile,name:,info,domain:,hostname:,network:,registry:,tag:,no-delete,interactive,cron,hub:"
 # - - - - - - - - - - - - - - - - - - - - - - - - -
 ARRAY="service proxy health attach multiarch builder api enter test exec active available connect cron download inactive init install k3b minikube "
 ARRAY+="list log ps rancher remove rm rmi run search status update version ds network helm prune generate manifest rebuild swarm"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # - - - - - - - - - - - - - - - - - - - - - - - - -
-##@Version           :  202610081005-git
+##@Version           :  202610102015-git
 # @Author            :  Jason Hempstead
 # @Contact           :  jason@casjaysdev.pro
 # @License           :  WTFPL
@@ -32,7 +32,7 @@ _dockermgr() {
   local OPTS=""
   local SHORTOPTS="-p -P -v -m -e -d -u -w"
   local LONGOPTS="--completions --debug --no-color --options --config --migrate --version --help --silent --dir --force --all --describe --platform --dockerfile "
-  local LONGOPTS+="--name --info --domain --hostname --network --registry --tagno-delete --interactive --cron --hub"
+  local LONGOPTS+="--name --info --domain --hostname --network --registry --tag --no-delete --interactive --cron --hub"
   local ARRAY="service proxy health attach multiarch builder api enter test exec active available connect cron download clone inactive init install k3b minikube "
   local ARRAY+="list log ps rancher remove rm rmi run search status update version ds network helm prune generate manifest rebuild swarm compose restart tag pull "
   local ARRAY+="commit copy readme swap org kasm fe server_status "

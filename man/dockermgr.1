@@ -1,5 +1,5 @@
 .\" Manpage for dockermgr
-.TH dockermgr 1 "October 8, 2026" "202610081005-git" "dockermgr"
+.TH dockermgr 1 "October 10, 2026" "202610102015-git" "dockermgr"
 
 .SH NAME
 dockermgr \- Comprehensive Docker container management and orchestration tool
@@ -50,6 +50,12 @@ Pull Docker images (updates all if no image specified)
 .TP
 .B prune [unnamed]
 Clean up Docker system or remove unnamed/untagged images
+.TP
+.B commit <name> <tag>
+Commit a running container as a new image
+.TP
+.B copy <source> <dest1,dest2,...>
+Copy/retag an image to one or more destination registries
 
 .SH SYSTEM MANAGEMENT COMMANDS
 .TP
@@ -82,6 +88,12 @@ Check container health status
 .TP
 .B proxy
 Setup Docker proxy container
+.TP
+.B swap [size-in-GB]
+Create a swap file (default 2G)
+.TP
+.B server_status <url> [name] [script]
+Check if a server/URL is responding
 
 .SH ORCHESTRATION COMMANDS
 .TP
@@ -105,6 +117,24 @@ Setup multi-architecture building with QEMU emulation
 .TP
 .B compose [update]
 Install or update Docker Compose
+.TP
+.B kasm
+Install Kasm Workspaces
+.TP
+.B fe
+Install front-end management panels (Yacht, nginx-manager)
+.TP
+.B manifest [create|download] [file]
+Build and push a multi-arch Docker manifest
+.TP
+.B rebuild <dir|file|repo-url> [name]
+Rebuild a Docker image from a Dockerfile using buildx
+.TP
+.B generate [dir]
+Generate Dockerfile/build files for a project
+.TP
+.B builder
+Experimental multi-arch builder container (work in progress)
 
 .SH APPLICATION MANAGEMENT COMMANDS
 .TP
@@ -154,6 +184,12 @@ List available source repositories
 .TP
 .B api readme <file> <org> <repo>
 Upload README file to Docker Hub repository
+.TP
+.B readme
+Upload README file to Docker Hub for the current image/repo
+.TP
+.B org [name]
+List repositories for a Docker Hub organization
 
 .SH OPTIONS
 .TP
@@ -186,6 +222,36 @@ Set custom container name
 .TP
 .B \-\-interactive
 Run containers in interactive mode
+.TP
+.B \-\-tag <tag>
+Set the tag used when pushing a manifest
+.TP
+.B \-\-no-delete
+Keep temporary manifest tags instead of deleting them
+.TP
+.B \-\-describe <text>
+Set the Docker Hub repository description
+.TP
+.B \-\-domain <domain>
+Set the container domain name
+.TP
+.B \-\-hostname <hostname>
+Set the container hostname
+.TP
+.B \-\-registry <registry>
+Set the registry to push/pull from
+.TP
+.B \-\-hub <url>
+Set the Docker Hub URL and registry
+.TP
+.B \-\-dockerfile
+Build from a local Dockerfile
+.TP
+.B \-\-info
+Show image/repository info
+.TP
+.B \-\-cron
+Run via the configured cron entry
 .TP
 .B \-\-help
 Display comprehensive help message
